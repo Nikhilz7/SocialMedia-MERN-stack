@@ -105,7 +105,7 @@ const MessengerWidget = ({ picturePath }) => {
 
         {/* MESSAGE B */}
 
-        <Grid
+        {/* <Grid
           container
           direction="column"
           justifyContent="flex-start"
@@ -138,7 +138,7 @@ const MessengerWidget = ({ picturePath }) => {
               </Typography>
             </Box>
           </FlexBetween>
-        </Grid>
+        </Grid> */}
       </Box>
       {/* MESSAGE SENDER  */}
 

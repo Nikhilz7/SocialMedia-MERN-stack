@@ -29,6 +29,7 @@ const Message = ({ picturePath, Messagetype }) => {
     >
       <FlexBetween gap="1rem">
         <Box
+          height="80%"
           display="flex"
           backgroundColor={`${boxbg}`}
           //   alignItems="right" //sender reciever adjust left right
@@ -40,7 +41,7 @@ const Message = ({ picturePath, Messagetype }) => {
           <UserImage image={picturePath} size="55px" />
           <Typography
             // color={`${palette.primary.main}`}
-            variant="h4"
+            variant="h5"
             fontWeight="500"
             sx={{
               "&:hover": {
