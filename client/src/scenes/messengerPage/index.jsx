@@ -13,7 +13,6 @@ const MessengerPage = () => {
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 
-  console.log("messengerPAGE");
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
       method: "GET",
@@ -42,9 +41,10 @@ const MessengerPage = () => {
         justifyContent="left"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={userId} picturePath={user.picturePath} />
-          <Box m="2rem 0" />
-          <FriendListWidget userId={userId} />
+          {/* <UserWidget userId={userId} picturePath={user.picturePath} />
+          <Box m="2rem 0" /> */}
+
+          <FriendListWidget key={userId} userId={userId} />
         </Box>
         <Box width="100%">
           <MessengerWidget picturePath={user.picturePath} />

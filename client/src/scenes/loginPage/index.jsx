@@ -12,7 +12,7 @@ const LoginPage = () => {
         textAlign="center"
       >
         <Typography fontWeight="bold" fontSize="32px" color="primary">
-          MemoryMedia
+          Sybrspace
         </Typography>
       </Box>
       <Box

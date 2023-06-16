@@ -7,12 +7,11 @@ import UserImage from "components/UserImage";
 
 const Message = ({ picturePath, Messagetype }) => {
   const { palette } = useTheme();
-  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
-  const mediumMain = palette.neutral.mediumMain;
-  const medium = palette.neutral.medium;
+  // const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  // const mediumMain = palette.neutral.mediumMain;
+  // const medium = palette.neutral.medium;
   let boxbg = "";
   let alignmessage = "";
-  console.log(Messagetype);
   if (Messagetype == "Received") {
     boxbg = palette.primary.light;
     alignmessage = "flex-start";

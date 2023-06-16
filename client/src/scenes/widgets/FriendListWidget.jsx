@@ -1,15 +1,33 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  InputBase,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
+import FlexBetween from "components/FlexBetween";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "state";
+import { Search } from "@mui/icons-material";
 
 const FriendListWidget = ({ userId }) => {
+  const theme = useTheme();
+  const neutralLight = theme.palette.neutral.light;
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
+
+  // const user_id = useSelector((state) => state.user._id);
+
+  const [searchField, setSearchField] = useState("");
+  const [filteredFriends, setFilteredFriends] = useState(friends);
+
+  const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 
   const getFriends = async () => {
     const response = await fetch(
@@ -23,9 +41,28 @@ const FriendListWidget = ({ userId }) => {
     dispatch(setFriends({ friends: data }));
   };
 
+  // Searchfield
+
+  const onSearchChange = (event) => {
+    const searchFieldString = event.target.value.toLocaleLowerCase();
+    // console.log(searchFieldString);
+    setSearchField(searchFieldString);
+  };
+
   useEffect(() => {
     getFriends();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const newFilteredFriends = friends.filter((friend) => {
+      const namefind = friend.firstName + " " + friend.lastName;
+      return namefind.toLocaleLowerCase().includes(searchField);
+    });
+    setFilteredFriends(newFilteredFriends);
+  }, [searchField, friends]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const currentURI = window.location.pathname;
+  console.log(currentURI);
 
   return (
     <WidgetWrapper>
@@ -38,7 +75,20 @@ const FriendListWidget = ({ userId }) => {
         Friend List
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
-        {friends.map((friend) => (
+        {isNonMobileScreens && (
+          <FlexBetween
+            backgroundColor={neutralLight}
+            borderRadius="9px"
+            gap="3rem"
+            padding="0.1rem 1.5rem"
+          >
+            <InputBase placeholder="Search..." onChange={onSearchChange} />
+            <IconButton>
+              <Search />
+            </IconButton>
+          </FlexBetween>
+        )}
+        {filteredFriends.map((friend) => (
           <Friend
             key={friend._id}
             friendId={friend._id}
