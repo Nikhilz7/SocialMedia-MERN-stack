@@ -23,13 +23,12 @@ import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
+import { SetMessages } from "state";
 
-const MessageSenderWidget = ({ picturePath }) => {
+const MessageSenderWidget = () => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
-  const [post, setPost] = useState("");
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -37,33 +36,47 @@ const MessageSenderWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
-  const handlePost = async () => {
-    const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("description", post);
-    if (image) {
-      formData.append("picture", image);
-      formData.append("picturePath", image.name);
-    }
+  const [newMessage, setNewMessage] = useState("");
 
-    const response = await fetch(`http://localhost:3001/posts`, {
+  const currentconversation = useSelector(
+    (state) => state.user.currentconversation
+  );
+
+  // console.log(currentconversation);
+  const handlePost = async () => {
+    // const formData = new FormData();
+    // formData.append("conversationId", currentconversation);
+    // formData.append("sender", _id);
+    // formData.append("text", newMessage);
+
+    const messageformat = {
+      conversationId: currentconversation,
+      sender: _id,
+      text: newMessage,
+    };
+    const response = await fetch(`http://localhost:3001/messages`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(messageformat),
     });
-    const posts = await response.json();
-    dispatch(setPosts({ posts }));
-    setImage(null);
-    setPost("");
+    const sentmessage = await response.json();
+    // console.log(sentmessage);
+    dispatch(SetMessages({ messages: sentmessage }));
+    // setImage(null);
+    setNewMessage("");
   };
+
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
         {/* <UserImage image={picturePath} /> */}
         <InputBase
           placeholder="What's on your mind?..."
-          onChange={(e) => setPost(e.target.value)}
-          value={post}
+          onChange={(e) => setNewMessage(e.target.value)}
+          value={newMessage}
           sx={{
             width: "100%",
             backgroundColor: palette.neutral.light,
@@ -152,16 +165,16 @@ const MessageSenderWidget = ({ picturePath }) => {
         )}
 
         <Button
-          disabled={true}
-          //   disabled={!post}
+          disabled={newMessage === ""}
           onClick={handlePost}
           sx={{
+            width: "10rem",
             color: palette.background.alt,
             backgroundColor: palette.primary.main,
             borderRadius: "3rem",
           }}
         >
-          POST
+          Send
         </Button>
       </FlexBetween>
     </WidgetWrapper>

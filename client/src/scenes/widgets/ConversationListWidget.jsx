@@ -73,7 +73,7 @@ const ConversationListWidget = ({ userId }) => {
 
   useEffect(() => {
     getCoversations();
-  }, [conversations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   //   const newFilteredFriends = friendsId.filter((friend) => {
   //     const namefind = friend.firstName + " " + friend.lastName;

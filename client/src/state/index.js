@@ -6,6 +6,7 @@ const initialState = {
   token: null,
   conversations: [],
   currentconversation: null,
+  messages: [],
   posts: [],
 };
 export const authSlice = createSlice({
@@ -52,6 +53,11 @@ export const authSlice = createSlice({
         state.user.currentconversation = action.payload.currentconversation;
       }
     },
+    SetMessages: (state, action) => {
+      if (state.user.currentconversation) {
+        state.user.messages = action.payload.messages;
+      }
+    },
   },
 });
 
@@ -64,5 +70,6 @@ export const {
   setPost,
   setConversations,
   SetCurrentConversation,
+  SetMessages,
 } = authSlice.actions;
 export default authSlice.reducer;

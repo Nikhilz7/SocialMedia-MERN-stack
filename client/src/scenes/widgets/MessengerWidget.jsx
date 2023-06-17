@@ -5,14 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import Message from "components/Message";
 import MessageSenderWidget from "./MessageSenderWidget";
-
 const MessengerWidget = () => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
   const [currentChat, setCurrentChat] = useState("set");
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
 
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
@@ -21,6 +19,8 @@ const MessengerWidget = () => {
     (state) => state.user.currentconversation
   );
   const conversations = useSelector((state) => state.user.conversations);
+
+  const messages_new = useSelector((state) => state.user.messages);
 
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
@@ -43,7 +43,7 @@ const MessengerWidget = () => {
 
   useEffect(() => {
     getMessagesindividually();
-  }, [currentconversation, messages]);
+  }, [currentconversation, messages_new]);
 
   return (
     <Box
