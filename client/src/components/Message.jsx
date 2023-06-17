@@ -1,18 +1,36 @@
-// import { useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { format } from "timeago.js";
 import { Box, Typography, useTheme, useMediaQuery, Grid } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import UserImage from "components/UserImage";
 
-const Message = ({ picturePath, Messagetype }) => {
+const Message = ({ senderId, own, message }) => {
   const { palette } = useTheme();
-  // const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const token = useSelector((state) => state.token);
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   // const mediumMain = palette.neutral.mediumMain;
   // const medium = palette.neutral.medium;
+  const [friendData, setFriendData] = useState([]);
+
+  // console.log(formattedTime);
+  const getUser = async () => {
+    const response = await fetch(`http://localhost:3001/users/${senderId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    setFriendData(data);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, [senderId]);
+
+  const picturePath = friendData.picturePath;
   let boxbg = "";
   let alignmessage = "";
-  if (Messagetype == "Received") {
+  if (!own) {
     boxbg = palette.primary.light;
     alignmessage = "flex-start";
   } else {
@@ -42,17 +60,25 @@ const Message = ({ picturePath, Messagetype }) => {
             // color={`${palette.primary.main}`}
             variant="h5"
             fontWeight="500"
-            sx={{
-              "&:hover": {
-                color: palette.primary.dark,
-                cursor: "pointer",
-              },
-            }}
+            // sx={{
+            //   "&:hover": {
+            //     color: palette.primary.dark,
+            //     cursor: "pointer",
+            //   },
+            // }}
           >
-            Lorem, ipsum dolor sit amet consectetur
+            {message.text}
           </Typography>
         </Box>
       </FlexBetween>
+      <Typography
+        variant="subtitle2"
+        // display="flex"
+        // justifyContent="flex-end"
+        // alignItems="flex-end"
+      >
+        {format(message.createdAt)}
+      </Typography>
     </Grid>
   );
 };

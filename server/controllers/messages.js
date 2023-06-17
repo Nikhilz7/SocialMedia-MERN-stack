@@ -22,9 +22,16 @@ export const createNewMessage = async (req, res) => {
 
 export const getMessageByConversationId = async (req, res) => {
   try {
-    const { conversationId } = req.body;
-    const message = await Message.find({ conversationId });
-    res.status(200).json(message);
+    // const { conversationId } = req.body;
+    // console.log("conversationId");
+    // const messages = await Message.find({});
+    const { conversationId } = req.params;
+    // const user = await User.findById(id);
+    const messages = await Message.find({
+      conversationId: conversationId,
+    });
+    // console.log(messages);
+    res.status(200).json(messages);
   } catch (error) {
     res.status(404).json({ message: err.message });
   }

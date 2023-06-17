@@ -1,65 +1,50 @@
-import {
-  EditOutlined,
-  DeleteOutlined,
-  AttachFileOutlined,
-  GifBoxOutlined,
-  ImageOutlined,
-  MicOutlined,
-  MoreHorizOutlined,
-} from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  Typography,
-  InputBase,
-  useTheme,
-  Button,
-  IconButton,
-  useMediaQuery,
-  Grid,
-} from "@mui/material";
-import FlexBetween from "components/FlexBetween";
-import Dropzone from "react-dropzone";
-import UserImage from "components/UserImage";
-import WidgetWrapper from "components/WidgetWrapper";
-import { useState } from "react";
+import { Box, useTheme, useMediaQuery, Grid } from "@mui/material";
+
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import Message from "components/Message";
+import MessageSenderWidget from "./MessageSenderWidget";
 
-const MessengerWidget = ({ picturePath }) => {
+const MessengerWidget = () => {
   const dispatch = useDispatch();
-  const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
+  const [currentChat, setCurrentChat] = useState("set");
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  const currentconversation = useSelector(
+    (state) => state.user.currentconversation
+  );
+  const conversations = useSelector((state) => state.user.conversations);
+
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
   const Messagetype = "Received";
 
-  const handlePost = async () => {
-    const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("description", post);
-    if (image) {
-      formData.append("picture", image);
-      formData.append("picturePath", image.name);
-    }
-
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    const posts = await response.json();
-    dispatch(setPosts({ posts }));
-    setImage(null);
-    setPost("");
+  const getMessagesindividually = async () => {
+    const response = await fetch(
+      `http://localhost:3001/messages/${currentconversation}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    // console.log(data);
+    setMessages(data);
   };
+
+  useEffect(() => {
+    getMessagesindividually();
+  }, [currentconversation, messages]);
+
   return (
     <Box
       direction="column"
@@ -67,6 +52,7 @@ const MessengerWidget = ({ picturePath }) => {
       alignItems="stretch"
       spacing={1}
     >
+      {/* if No convo selected */}
       {/* MESSAGES */}
       <Box
         sx={{
@@ -83,63 +69,36 @@ const MessengerWidget = ({ picturePath }) => {
             width: "0.4em",
           },
           "&::-webkit-scrollbar-track": {
-            background: "#f1f1f1",
+            background: "#555",
             borderRadius: "5px",
           },
           "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "grey",
+            backgroundColor: "#24248f",
             borderRadius: "5px",
           },
           "&::-webkit-scrollbar-thumb:hover": {
-            background: "#555",
+            background: "#3333cc",
           },
           //   justifyContent: "flex-end",
           //   # DO NOT USE THIS WITH 'scroll'
         }}
       >
-        <Message picturePath={picturePath} Messagetype={Messagetype} />
-        <Message picturePath={picturePath} Messagetype="sent" />
-        <Message picturePath={picturePath} Messagetype={Messagetype} />
-        <Message picturePath={picturePath} Messagetype="sent" />
-        <Message picturePath={picturePath} Messagetype={Messagetype} />
-
-        {/* MESSAGE B */}
-
-        {/* <Grid
-          container
-          direction="column"
-          justifyContent="flex-start"
-          alignItems="flex-end"
-        >
-          <FlexBetween gap="1rem">
-            <Box
-              display="flex"
-              backgroundColor={`${palette.primary.main}`}
-              alignItems="right"
-              justifyContent="end" //sender reciever adjust left right
-              gap="1rem"
-              borderRadius="20px"
-              mt="1rem"
-              p="1rem"
-            >
-              <UserImage image={picturePath} size="55px" />
-              <Typography
-                // color={`${palette.primary.main}`}
-                variant="h4"
-                fontWeight="500"
-                sx={{
-                  "&:hover": {
-                    color: palette.primary.dark,
-                    cursor: "pointer",
-                  },
-                }}
-              >
-                Lorem, ipsum dolor sit amet consectetur
-              </Typography>
-            </Box>
-          </FlexBetween>
-        </Grid> */}
+        {conversations !== undefined ? (
+          <>
+            {/* Render Message component by mapping  */}
+            {messages.map((m) => (
+              <Message senderId={m.sender} message={m} own={m.sender === _id} />
+            ))}
+          </>
+        ) : (
+          <span>
+            SELECT ANY CONVERSATION FROM
+            {/* <Message picturePath={picturePath} Messagetype="sent" />
+            <Message picturePath={picturePath} Messagetype={Messagetype} /> */}
+          </span>
+        )}
       </Box>
+
       {/* MESSAGE SENDER  */}
 
       <Grid
@@ -149,117 +108,8 @@ const MessengerWidget = ({ picturePath }) => {
         alignItems="stretch"
         mt="1rem"
       >
-        <WidgetWrapper
-          direction="column-reverse"
-          justifyContent="flex-end"
-          alignItems="stretch"
-        >
-          <FlexBetween gap="1.5rem">
-            <UserImage image={picturePath} />
-            <InputBase
-              placeholder="What's on your mind?..."
-              onChange={(e) => setPost(e.target.value)}
-              value={post}
-              sx={{
-                width: "100%",
-                backgroundColor: palette.neutral.light,
-                borderRadius: "2rem",
-                padding: "1rem 2rem",
-              }}
-            />
-          </FlexBetween>
-          {isImage && (
-            <Box
-              border={`1px solid ${medium}`}
-              borderRadius="5px"
-              mt="1rem"
-              p="1rem"
-            >
-              <Dropzone
-                acceptedFiles=".jpg,.jpeg,.png"
-                multiple={false}
-                onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-              >
-                {({ getRootProps, getInputProps }) => (
-                  <FlexBetween>
-                    <Box
-                      {...getRootProps()}
-                      border={`2px dashed ${palette.primary.main}`}
-                      p="1rem"
-                      width="100%"
-                      sx={{ "&:hover": { cursor: "pointer" } }}
-                    >
-                      <input {...getInputProps()} />
-                      {!image ? (
-                        <p>Add Image Here</p>
-                      ) : (
-                        <FlexBetween>
-                          <Typography>{image.name}</Typography>
-                          <EditOutlined />
-                        </FlexBetween>
-                      )}
-                    </Box>
-                    {image && (
-                      <IconButton
-                        onClick={() => setImage(null)}
-                        sx={{ width: "15%" }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
-                    )}
-                  </FlexBetween>
-                )}
-              </Dropzone>
-            </Box>
-          )}
-
-          <Divider sx={{ margin: "1.25rem 0" }} />
-          <FlexBetween>
-            <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
-              <ImageOutlined sx={{ color: mediumMain }} />
-              <Typography
-                color={mediumMain}
-                sx={{ "&:hover": { cursor: "pointer", color: medium } }}
-              >
-                Image
-              </Typography>
-            </FlexBetween>
-            {isNonMobileScreens ? (
-              <>
-                <FlexBetween gap="0.25rem">
-                  <GifBoxOutlined sx={{ color: mediumMain }} />
-                  <Typography color={mediumMain}>Clip</Typography>
-                </FlexBetween>
-
-                <FlexBetween gap="0.25rem">
-                  <AttachFileOutlined sx={{ color: mediumMain }} />
-                  <Typography color={mediumMain}>Attachment</Typography>
-                </FlexBetween>
-
-                <FlexBetween gap="0.25rem">
-                  <MicOutlined sx={{ color: mediumMain }} />
-                  <Typography color={mediumMain}>Audio</Typography>
-                </FlexBetween>
-              </>
-            ) : (
-              <FlexBetween gap="0.25rem">
-                <MoreHorizOutlined sx={{ color: mediumMain }} />
-              </FlexBetween>
-            )}
-
-            <Button
-              disabled={!post}
-              onClick={handlePost}
-              sx={{
-                color: palette.background.alt,
-                backgroundColor: palette.primary.main,
-                borderRadius: "3rem",
-              }}
-            >
-              SEND
-            </Button>
-          </FlexBetween>
-        </WidgetWrapper>
+        {/* sender component */}
+        <MessageSenderWidget />
       </Grid>
     </Box>
   );

@@ -61,9 +61,6 @@ const FriendListWidget = ({ userId }) => {
     setFilteredFriends(newFilteredFriends);
   }, [searchField, friends]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const currentURI = window.location.pathname;
-  console.log(currentURI);
-
   return (
     <WidgetWrapper>
       <Typography

@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Navbar from "scenes/navbar";
-import FriendListWidget from "scenes/widgets/FriendListWidget";
+import ConversationListWidget from "scenes/widgets/ConversationListWidget";
 import MessengerWidget from "scenes/widgets/MessengerWidget";
-import UserWidget from "scenes/widgets/UserWidget";
 
 const MessengerPage = () => {
   const [user, setUser] = useState(null);
@@ -44,10 +43,10 @@ const MessengerPage = () => {
           {/* <UserWidget userId={userId} picturePath={user.picturePath} />
           <Box m="2rem 0" /> */}
 
-          <FriendListWidget key={userId} userId={userId} />
+          <ConversationListWidget userId={userId} />
         </Box>
         <Box width="100%">
-          <MessengerWidget picturePath={user.picturePath} />
+          <MessengerWidget />
         </Box>
       </Box>
     </Box>

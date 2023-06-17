@@ -23,8 +23,8 @@ export const createConversation = async (req, res) => {
 export const getConversations = async (req, res) => {
   try {
     const { userId } = req.params;
-    const conversation = await Conversation.find({ userId });
-    // const conversation = await Conversation.find({ members: { $in: userId } });
+    // const conversation = await Conversation.find({ userId });
+    const conversation = await Conversation.find({ members: { $in: userId } });
     res.status(200).json(conversation);
   } catch (error) {
     res.status(404).json({ message: err.message });
