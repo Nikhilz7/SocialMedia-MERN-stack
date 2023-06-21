@@ -21,8 +21,7 @@ const FriendListWidget = ({ userId }) => {
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
-
-  // const user_id = useSelector((state) => state.user._id);
+  const conversations = useSelector((state) => state.user.conversations);
 
   const [searchField, setSearchField] = useState("");
   const [filteredFriends, setFilteredFriends] = useState(friends);
@@ -40,6 +39,26 @@ const FriendListWidget = ({ userId }) => {
     const data = await response.json();
     dispatch(setFriends({ friends: data }));
   };
+
+  //check if it is message page
+  let isMessagePage = false;
+  const currentURI = window.location.pathname;
+  if (currentURI.includes("messenger")) {
+    isMessagePage = true;
+  }
+  let filteredData = [];
+  if (isMessagePage && conversations != undefined) {
+    //filter friend list by conversation list
+    const ConversationfriendId = conversations.map((obj) =>
+      obj.members.filter((member) => member !== userId)
+    );
+
+    // console.log(ConversationfriendId);
+    // console.log(friends);
+    filteredData = friends.filter((item) => {
+      return !ConversationfriendId.some((arr) => arr.includes(item._id));
+    });
+  }
 
   // Searchfield
 
@@ -72,7 +91,7 @@ const FriendListWidget = ({ userId }) => {
         Friend List
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
-        {isNonMobileScreens && (
+        {!isMessagePage && isNonMobileScreens && (
           <FlexBetween
             backgroundColor={neutralLight}
             borderRadius="9px"
@@ -85,15 +104,25 @@ const FriendListWidget = ({ userId }) => {
             </IconButton>
           </FlexBetween>
         )}
-        {filteredFriends.map((friend) => (
-          <Friend
-            key={friend._id}
-            friendId={friend._id}
-            name={`${friend.firstName} ${friend.lastName}`}
-            subtitle={friend.occupation}
-            userPicturePath={friend.picturePath}
-          />
-        ))}
+        {isMessagePage
+          ? filteredData.map((friend) => (
+              <Friend
+                key={friend._id}
+                friendId={friend._id}
+                name={`${friend.firstName} ${friend.lastName}`}
+                subtitle={friend.occupation}
+                userPicturePath={friend.picturePath}
+              />
+            ))
+          : filteredFriends.map((friend) => (
+              <Friend
+                key={friend._id}
+                friendId={friend._id}
+                name={`${friend.firstName} ${friend.lastName}`}
+                subtitle={friend.occupation}
+                userPicturePath={friend.picturePath}
+              />
+            ))}
       </Box>
     </WidgetWrapper>
   );

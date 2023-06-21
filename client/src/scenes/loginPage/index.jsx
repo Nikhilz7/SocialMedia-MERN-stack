@@ -25,6 +25,9 @@ const LoginPage = () => {
         <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
           Welcome to Sybrspace, a world to share your space with others!
         </Typography>
+        <Typography fontWeight="bold" fontSize="16px" color="primary">
+          Try email: demo@demo.com password:demo
+        </Typography>
         <Form />
       </Box>
     </Box>

@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom";
 import Navbar from "scenes/navbar";
 import ConversationListWidget from "scenes/widgets/ConversationListWidget";
 import MessengerWidget from "scenes/widgets/MessengerWidget";
-
+import FriendListWidget from "scenes/widgets/FriendListWidget";
 const MessengerPage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-
+  const { _id } = useSelector((state) => state.user);
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
       method: "GET",
@@ -40,13 +40,14 @@ const MessengerPage = () => {
         justifyContent="left"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          {/* <UserWidget userId={userId} picturePath={user.picturePath} />
-          <Box m="2rem 0" /> */}
-
           <ConversationListWidget userId={userId} />
         </Box>
-        <Box width="100%">
+        <Box width="100%" flexBasis={isNonMobileScreens ? "50%" : undefined}>
           <MessengerWidget />
+        </Box>
+        <Box flexBasis="26%">
+          <Box m="2rem 0" />
+          <FriendListWidget userId={_id} />
         </Box>
       </Box>
     </Box>

@@ -1,10 +1,15 @@
-import { Box, useTheme, useMediaQuery, Grid } from "@mui/material";
+import { Box, useTheme, Typography, useMediaQuery, Grid } from "@mui/material";
+import ScrollToBottom, {
+  useScrollToBottom,
+  useSticky,
+} from "react-scroll-to-bottom";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import Message from "components/Message";
 import MessageSenderWidget from "./MessageSenderWidget";
+
 const MessengerWidget = () => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
@@ -26,7 +31,14 @@ const MessengerWidget = () => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
-  const Messagetype = "Received";
+  const scrollToBottom = useScrollToBottom();
+  const [sticky] = useSticky();
+
+  // const messagesEndRef = useRef(null);
+
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // };
 
   const getMessagesindividually = async () => {
     const response = await fetch(
@@ -43,7 +55,8 @@ const MessengerWidget = () => {
 
   useEffect(() => {
     getMessagesindividually();
-  }, [currentconversation, messages_new]);
+    // ScrollToBottom.useScrollToEnd();
+  }, [currentconversation, messages_new]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Box
@@ -54,6 +67,7 @@ const MessengerWidget = () => {
     >
       {/* if No convo selected */}
       {/* MESSAGES */}
+
       <Box
         sx={{
           mb: 2,
@@ -83,22 +97,41 @@ const MessengerWidget = () => {
           //   # DO NOT USE THIS WITH 'scroll'
         }}
       >
-        {conversations !== undefined ? (
+        {messages.length > 0 ? (
           <>
             {/* Render Message component by mapping  */}
             {messages.map((m) => (
-              <Message senderId={m.sender} message={m} own={m.sender === _id} />
+              <ScrollToBottom>
+                <Message
+                  senderId={m.sender}
+                  message={m}
+                  own={m.sender === _id}
+                />
+                {!sticky && (
+                  <button onClick={scrollToBottom}>
+                    Click me to scroll to bottom
+                  </button>
+                )}
+              </ScrollToBottom>
             ))}
           </>
         ) : (
-          <span>
-            SELECT ANY CONVERSATION FROM
-            {/* <Message picturePath={picturePath} Messagetype="sent" />
-            <Message picturePath={picturePath} Messagetype={Messagetype} /> */}
-          </span>
+          <Typography
+            color={`${palette.primary.main}`}
+            variant="h2"
+            fontWeight="500"
+            sx={{
+              textAlign: "center",
+              "&:hover": {
+                color: palette.primary.dark,
+                cursor: "pointer",
+              },
+            }}
+          >
+            Select a coversation from the list!
+          </Typography>
         )}
       </Box>
-
       {/* MESSAGE SENDER  */}
 
       <Grid
