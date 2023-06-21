@@ -31,10 +31,10 @@ const Message = ({ senderId, own, message }) => {
   let boxbg = "";
   let alignmessage = "";
   if (!own) {
-    boxbg = palette.primary.light;
+    boxbg = palette.background.alt;
     alignmessage = "flex-start";
   } else {
-    boxbg = palette.primary.main;
+    boxbg = palette.neutral.light;
     alignmessage = "flex-end";
   }
   return (
@@ -57,7 +57,7 @@ const Message = ({ senderId, own, message }) => {
         >
           <UserImage image={picturePath} size="55px" />
           <Typography
-            // color={`${palette.primary.main}`}
+            color={`${palette.neutral.main}`}
             variant="h5"
             fontWeight="500"
             // sx={{

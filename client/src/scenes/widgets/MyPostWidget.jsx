@@ -156,12 +156,12 @@ const MyPostWidget = ({ picturePath }) => {
           onClick={handlePost}
           sx={{
             width: "10rem",
-            color: palette.background.alt,
-            backgroundColor: palette.primary.main,
+            // color: palette.primary.dark,
+            backgroundColor: palette.primary.light,
             borderRadius: "3rem",
           }}
         >
-          POST
+          <Typography color={palette.primary.dark}>Post</Typography>
         </Button>
       </FlexBetween>
     </WidgetWrapper>

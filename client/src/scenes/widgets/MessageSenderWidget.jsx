@@ -18,8 +18,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Dropzone from "react-dropzone";
-import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,8 +25,6 @@ import { SetMessages } from "state";
 
 const MessageSenderWidget = () => {
   const dispatch = useDispatch();
-  const [isImage, setIsImage] = useState(false);
-  const [image, setImage] = useState(null);
   const { palette } = useTheme();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -85,54 +81,10 @@ const MessageSenderWidget = () => {
           }}
         />
       </FlexBetween>
-      {isImage && (
-        <Box
-          border={`1px solid ${medium}`}
-          borderRadius="5px"
-          mt="1rem"
-          p="1rem"
-        >
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
-                <Box
-                  {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  p="1rem"
-                  width="100%"
-                  sx={{ "&:hover": { cursor: "pointer" } }}
-                >
-                  <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
-                  ) : (
-                    <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
-                    </FlexBetween>
-                  )}
-                </Box>
-                {image && (
-                  <IconButton
-                    onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
-                  >
-                    <DeleteOutlined />
-                  </IconButton>
-                )}
-              </FlexBetween>
-            )}
-          </Dropzone>
-        </Box>
-      )}
 
       <Divider sx={{ margin: "1.25rem 0" }} />
       <FlexBetween>
-        <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+        <FlexBetween gap="0.25rem">
           <ImageOutlined sx={{ color: mediumMain }} />
           <Typography
             color={mediumMain}
@@ -165,16 +117,15 @@ const MessageSenderWidget = () => {
         )}
 
         <Button
-          disabled={newMessage === ""}
+          disabled={newMessage.trim() === ""}
           onClick={handlePost}
           sx={{
             width: "10rem",
-            color: palette.background.alt,
-            backgroundColor: palette.primary.main,
+            backgroundColor: palette.primary.light,
             borderRadius: "3rem",
           }}
         >
-          Send
+          <Typography color={palette.primary.dark}>Send</Typography>
         </Button>
       </FlexBetween>
     </WidgetWrapper>
