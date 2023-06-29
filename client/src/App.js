@@ -1,13 +1,15 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import HomePage from "scenes/homePage";
-import LoginPage from "scenes/loginPage";
-import ProfilePage from "scenes/profilePage";
-import MessengerPage from "scenes/messengerPage";
-import { useMemo } from "react";
+import { useMemo, lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
+import Spinner from "components/spinner/spinner.component";
+
+const HomePage = lazy(() => import("scenes/homePage"));
+const LoginPage = lazy(() => import("scenes/loginPage"));
+const ProfilePage = lazy(() => import("scenes/profilePage"));
+const MessengerPage = lazy(() => import("scenes/messengerPage"));
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -15,12 +17,12 @@ function App() {
   const isAuth = Boolean(useSelector((state) => state.token));
 
   return (
-    <div className="app">
-      <BrowserRouter>
+    <BrowserRouter>
+      <Suspense fallback={<Spinner />}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={isAuth ? <HomePage /> : <LoginPage />} />
             <Route
               path="/home"
               element={isAuth ? <HomePage /> : <Navigate to="/" />}
@@ -35,8 +37,8 @@ function App() {
             />
           </Routes>
         </ThemeProvider>
-      </BrowserRouter>
-    </div>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 
