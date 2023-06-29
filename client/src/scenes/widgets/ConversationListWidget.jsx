@@ -34,7 +34,7 @@ const ConversationListWidget = ({ userId }) => {
 
   useEffect(() => {
     getCoversations();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conversations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <WidgetWrapper>
