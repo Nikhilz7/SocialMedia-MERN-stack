@@ -1,10 +1,15 @@
-import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
+import {
+  PersonAddOutlined,
+  Message,
+  PersonRemoveOutlined,
+} from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFriends } from "state";
+import { setConversations, setFriends } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
+import { BASE_URL } from "config";
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
@@ -20,30 +25,70 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const medium = palette.neutral.medium;
 
   const isFriend = friends.find((friend) => friend._id === friendId);
+  //filter friend list by conversation list
+  const conversations = useSelector((state) => state.user.conversations);
+
+  // const ConversationfriendId = conversations.map((obj) =>
+  //   obj.members.filter((member) => member !== _id)
+  // );
+
+  // console.log(friends);
+
+  // const filterForMessage = friends.map((friend) =>
+  //   friend.id.includes(ConversationFriendId);
+  // );
+  //check if it is message page
+  let isMessagePage = false;
+  const currentURI = window.location.pathname;
+  if (currentURI.includes("messenger")) {
+    isMessagePage = true;
+  }
 
   const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
+    const response = await fetch(`${BASE_URL}/users/${_id}/${friendId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    dispatch(setFriends({ friends: data }));
+  };
+
+  const addConversation = async () => {
+    try {
+      const conversationformat = {
+        senderId: _id,
+        receiverId: friendId,
+      };
+      const response = await fetch(`${BASE_URL}/conversations`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
-    );
-    const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+        body: JSON.stringify(conversationformat),
+      });
+      const allconvo = await response.json();
+      dispatch(setConversations({ conversations: allconvo }));
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
         <UserImage image={userPicturePath} size="55px" />
+
         <Box
           onClick={() => {
-            navigate(`/profile/${friendId}`);
-            navigate(0);
+            if (!isMessagePage) {
+              navigate(`/profile/${friendId}`);
+              navigate(0);
+            } else {
+            }
           }}
         >
           <Typography
@@ -64,16 +109,26 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      <IconButton
-        onClick={() => patchFriend()}
-        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-      >
-        {isFriend ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
-        )}
-      </IconButton>
+      {isMessagePage ? (
+        <Message
+          sx={{ fontSize: "25px" }}
+          onClick={addConversation}
+          // onClick={() => {
+          //   // navigate(`/messenger/${user_id}`);
+          // }}
+        />
+      ) : (
+        <IconButton
+          onClick={() => patchFriend()}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          {isFriend ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
+        </IconButton>
+      )}
     </FlexBetween>
   );
 };
